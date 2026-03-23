@@ -170,9 +170,9 @@
                             <label class="option-label"><input type="radio" name="feeType_jp" value="percent" checked> 按比例 (%)</label>
                             <label class="option-label"><input type="radio" name="feeType_jp" value="fixed"> 固定台幣</label>
                         </div>
-                        <input type="number" id="serviceFee_jp" placeholder="輸入數值" inputmode="decimal">
+                        <input type="number" id="serviceFee_jp" placeholder="輸入比例 或 固定金額" inputmode="decimal">
                     </div>
-                    <div class="input-group"><label>4. 商品重量 (g)</label><div class="inline-calc-container"><input type="number" id="weight_jp" placeholder="重量" oninput="calculateWeightFee_jp()" inputmode="decimal"><span id="weightFeeDisplay_jp" class="inline-calc-result">= 0 元</span></div><span style="font-size: 12px; color: #A0A0A0; margin-top: 5px; display: block;">預估國際運費：克重 × 0.25</span></div>
+                    <div class="input-group"><label>4. 商品重量 (g)</label><div class="inline-calc-container"><input type="number" id="weight_jp" placeholder="商品重量" oninput="calculateWeightFee_jp()" inputmode="decimal"><span id="weightFeeDisplay_jp" class="inline-calc-result">= 0 元</span></div><span style="font-size: 12px; color: #A0A0A0; margin-top: 5px; display: block;">預估國際運費：克重 × 0.25</span></div>
                     
                     <div class="input-group">
                         <label>5. 台灣 / 日本 國內運費</label>
@@ -231,9 +231,9 @@
                             <label class="option-label"><input type="radio" name="feeType_kr" value="percent" checked> 按比例 (%)</label>
                             <label class="option-label"><input type="radio" name="feeType_kr" value="fixed"> 固定台幣</label>
                         </div>
-                        <input type="number" id="serviceFee_kr" placeholder="輸入數值" inputmode="decimal">
+                        <input type="number" id="serviceFee_kr" placeholder="輸入比例 或 固定金額" inputmode="decimal">
                     </div>
-                    <div class="input-group"><label>4. 重量 (g)</label><div class="inline-calc-container"><input type="number" id="weight_kr" placeholder="重量" oninput="calculateWeightFee_kr()" inputmode="decimal"><span id="weightFeeDisplay_kr" class="inline-calc-result">= 0 元</span></div><span style="font-size: 12px; color: #A0A0A0; margin-top: 5px; display: block;">預估國際運費：克重 × 0.19</span></div>
+                    <div class="input-group"><label>4. 重量 (g)</label><div class="inline-calc-container"><input type="number" id="weight_kr" placeholder="商品重量" oninput="calculateWeightFee_kr()" inputmode="decimal"><span id="weightFeeDisplay_kr" class="inline-calc-result">= 0 元</span></div><span style="font-size: 12px; color: #A0A0A0; margin-top: 5px; display: block;">預估國際運費：克重 × 0.19</span></div>
                     <div class="input-group"><label>5. 台灣運費</label><select id="localShipping_kr"><option value="60">7-11 店到店 60</option><option value="40">郵局(小) 40</option><option value="80">郵局(大) 80</option></select></div>
                     <button class="primary-btn" onclick="calculateTotal_kr()">立即計算總價</button>
                 </div>
