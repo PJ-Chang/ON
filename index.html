@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta id="viewportMeta" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
-    <title>Nippon Select & OLANA 嚴選代購</title>
+    <title>ON SELECT</title>
     <style>
         /* ================= 變數與主題 ================= */
         body.theme-jp {
@@ -67,7 +67,10 @@
             background: #fdfdfd; border: 2px dashed #ccc; color: #666;
         }
 
-        .page-layout { display: flex; width: 100%; max-width: 1200px; align-items: flex-start; justify-content: center; }
+        /* 置中關鍵：使用 flex 置中排版 */
+        .page-layout { display: flex; width: 100%; align-items: flex-start; justify-content: center; }
+        
+        /* 側邊欄佔位器：當關閉時 width 為 0，主畫面自然置中 */
         .sidebar-spacer { width: 0; transition: width 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); flex-shrink: 0; }
         .sidebar-spacer.open { width: 370px; }
         @media (max-width: 900px) { .sidebar-spacer.open { width: 0 !important; } }
@@ -88,7 +91,7 @@
 
         .saved-list-container { flex: 1; overflow-y: auto; }
 
-        /* 卡片共用樣式 */
+        /* 卡片樣式 */
         .saved-item { background: #FCFAFA; border: 1px solid #E0D8D0; border-radius: 12px; padding: 15px; margin-bottom: 15px; position: relative; display: flex; align-items: flex-start; gap: 12px; box-sizing: border-box; }
         .item-content { flex: 1; display: flex; flex-direction: column; position: relative; text-align: left; }
         .quote-name { font-size: 18px; color: #4A4036; display: block; margin-bottom: 4px; font-weight: bold; }
@@ -147,8 +150,8 @@
             <div class="sidebar" id="sidebar_jp">
                 <div class="sidebar-header"><h3>Nippon Select</h3><span class="close-btn" onclick="toggleSidebar_jp()">✖</span></div>
                 <button class="switch-app-btn" onclick="switchApp('kr')">🔄 切換至 OLANA 韓國代購</button>
-                <p id="emptyMsg_jp" style="color: #A0A0A0; font-size: 14px; text-align: center; margin-top: 30px;">目前尚無紀錄</p>
                 <div class="saved-list-container" id="savedList_jp"></div>
+                <p id="emptyMsg_jp" style="color: #A0A0A0; font-size: 14px; text-align: center; margin-top: 30px;">目前尚無紀錄</p>
             </div>
             <div class="sidebar-spacer" id="sidebarSpacer_jp"></div>
             <div class="main-container">
@@ -198,8 +201,8 @@
             <div class="sidebar" id="sidebar_kr">
                 <div class="sidebar-header"><h3>OLANA</h3><span class="close-btn" onclick="toggleSidebar_kr()">✖</span></div>
                 <button class="switch-app-btn" onclick="switchApp('jp')">🔄 切換至 Nippon Select</button>
-                <p id="emptyMsg_kr" style="color: #9A8C7F; font-size: 14px; text-align: center; margin-top: 30px;">目前尚無紀錄</p>
                 <div class="saved-list-container" id="savedList_kr"></div>
+                <p id="emptyMsg_kr" style="color: #9A8C7F; font-size: 14px; text-align: center; margin-top: 30px;">目前尚無紀錄</p>
             </div>
             <div class="sidebar-spacer" id="sidebarSpacer_kr"></div>
             <div class="main-container">
@@ -207,7 +210,7 @@
                     <h2>OLANA 嚴選代購</h2>
                     <div class="input-group"><label>1. 商品幣別</label><select id="currency_kr" onchange="toggleCustomRate_kr()"><option value="42">韓幣 ÷ 42</option><option value="custom">自訂匯率</option></select>
                     <div id="customRateContainer_kr" style="display: none; margin-top: 10px;"><input type="number" id="customRate_kr" placeholder="輸入除數" oninput="calculateItemPrice_kr()" inputmode="decimal"></div></div>
-                    <div class="input-group"><label>2. 商品原價 (₩)</label><div class="inline-calc-container"><input type="number" id="price_kr" placeholder="輸入原價" oninput="calculateItemPrice_kr()" inputmode="decimal"><span id="itemPriceDisplay_kr" class="inline-calc-result">= 0 元</span></div></div>
+                    <div class="input-group"><label id="priceLabel_kr">2. 商品原價 (₩)</label><div class="inline-calc-container"><input type="number" id="price_kr" placeholder="輸入原價" oninput="calculateItemPrice_kr()" inputmode="decimal"><span id="itemPriceDisplay_kr" class="inline-calc-result">= 0 元</span></div></div>
                     <div class="input-group"><label>3. 利潤</label><div class="radio-group"><label><input type="radio" name="feeType_kr" value="percent" checked> 按比例 (%)</label><label><input type="radio" name="feeType_kr" value="fixed"> 固定台幣</label></div><input type="number" id="serviceFee_kr" placeholder="輸入數值" inputmode="decimal"></div>
                     <div class="input-group"><label>4. 重量 (g)</label><div class="inline-calc-container"><input type="number" id="weight_kr" placeholder="重量" oninput="calculateWeightFee_kr()" inputmode="decimal"><span id="weightFeeDisplay_kr" class="inline-calc-result">= 0 元</span></div><span style="font-size: 12px; color: #A0A0A0; margin-top: 5px; display: block;">預估國際運費：克重 × 0.19</span></div>
                     <div class="input-group"><label>5. 台灣運費</label><select id="localShipping_kr"><option value="60">7-11 60</option><option value="40">郵局(小) 40</option><option value="80">郵局(大) 80</option></select></div>
@@ -227,19 +230,22 @@
     </div>
 
     <script>
+        // === 切換 App 與記憶模式 ===
         function switchApp(mode) {
             document.querySelectorAll('.app-container').forEach(el => el.classList.remove('active'));
+            // 每次切換都隱藏側邊欄，確保畫面置中
             document.querySelectorAll('.sidebar, .sidebar-spacer').forEach(el => el.classList.remove('open'));
             document.querySelectorAll('.toggle-sidebar-btn').forEach(el => el.classList.remove('hidden'));
+            
             if (mode === 'kr') {
                 document.getElementById('app-kr').classList.add('active');
                 document.body.className = 'theme-kr';
-                document.title = "OLANA 嚴選代購";
             } else {
                 document.getElementById('app-jp').classList.add('active');
                 document.body.className = 'theme-jp';
-                document.title = "Nippon Select 日本代購";
             }
+            // 記憶目前模式
+            localStorage.setItem('onSelectActiveMode', mode);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -300,6 +306,7 @@
             document.getElementById('quoteName_jp').value = '';
             saveOrderToStorage_jp();
             if (!document.getElementById('sidebar_jp').classList.contains('open')) toggleSidebar_jp();
+            document.getElementById('saveBtn_jp').disabled = true;
         }
         function renderSavedItem_jp(id, name, cost, total, prepend) {
             const div = document.createElement('div'); div.className = 'saved-item'; div.id = id;
@@ -312,7 +319,7 @@
             const text = `${el.querySelector('.quote-name').innerText}\n${el.querySelector('.quote-cost').innerText}\n${el.querySelector('.quote-total').innerText}`;
             navigator.clipboard.writeText(text).then(() => alert('已複製報價！'));
         }
-        function deleteItem_jp(id) { document.getElementById(id).remove(); saveOrderToStorage_jp(); }
+        function deleteItem_jp(id) { document.getElementById(id).remove(); if(document.querySelectorAll('#app-jp .saved-item').length === 0) document.getElementById('emptyMsg_jp').style.display = 'block'; saveOrderToStorage_jp(); }
         function saveOrderToStorage_jp() {
             const items = [];
             document.querySelectorAll('#app-jp .saved-item').forEach(el => {
@@ -331,14 +338,16 @@
                 document.body.classList.remove('force-desktop');
                 document.getElementById('viewportMeta').setAttribute('content', 'width=device-width, initial-scale=1.0');
                 btn.innerHTML = '💻 電腦版';
+                document.getElementById('viewSwitchBtn_kr').innerHTML = '💻 電腦版';
             } else {
                 document.body.classList.add('force-desktop');
                 document.getElementById('viewportMeta').setAttribute('content', 'width=1100');
                 btn.innerHTML = '📱 手機版';
+                document.getElementById('viewSwitchBtn_kr').innerHTML = '📱 手機版';
             }
         }
 
-        // === 韓國版邏輯 (OLANA) ===
+        // === 韓國版邏輯 ===
         function toggleCustomRate_kr() {
             const isCustom = document.getElementById('currency_kr').value === 'custom';
             document.getElementById('customRateContainer_kr').style.display = isCustom ? 'block' : 'none';
@@ -385,6 +394,7 @@
             document.getElementById('quoteName_kr').value = '';
             saveOrderToStorage_kr();
             if (!document.getElementById('sidebar_kr').classList.contains('open')) toggleSidebar_kr();
+            document.getElementById('saveBtn_kr').disabled = true;
         }
         function renderSavedItem_kr(id, name, cost, total, prepend) {
             const div = document.createElement('div'); div.className = 'saved-item'; div.id = id;
@@ -392,7 +402,7 @@
             const list = document.getElementById('savedList_kr');
             if(prepend) list.insertBefore(div, list.firstChild); else list.appendChild(div);
         }
-        function deleteItem_kr(id) { document.getElementById(id).remove(); saveOrderToStorage_kr(); }
+        function deleteItem_kr(id) { document.getElementById(id).remove(); if(document.querySelectorAll('#app-kr .saved-item').length === 0) document.getElementById('emptyMsg_kr').style.display = 'block'; saveOrderToStorage_kr(); }
         function saveOrderToStorage_kr() {
             const items = [];
             document.querySelectorAll('#app-kr .saved-item').forEach(el => {
@@ -406,25 +416,37 @@
                 document.body.classList.remove('force-desktop');
                 document.getElementById('viewportMeta').setAttribute('content', 'width=device-width, initial-scale=1.0');
                 btn.innerHTML = '💻 電腦版';
+                document.getElementById('viewSwitchBtn_jp').innerHTML = '💻 電腦版';
             } else {
                 document.body.classList.add('force-desktop');
                 document.getElementById('viewportMeta').setAttribute('content', 'width=1100');
                 btn.innerHTML = '📱 手機版';
+                document.getElementById('viewSwitchBtn_jp').innerHTML = '📱 手機版';
             }
         }
 
-        // === 初始化 ===
+        // === 初始化與恢復模式 ===
         window.addEventListener('DOMContentLoaded', () => {
+            // 恢復最後一次使用的模式
+            const lastMode = localStorage.getItem('onSelectActiveMode') || 'jp';
+            switchApp(lastMode);
+
+            // 載入日本紀錄
             const jpData = JSON.parse(localStorage.getItem('nipponSelectQuotes') || '[]');
             jpData.forEach(q => renderSavedItem_jp(q.id, q.name, q.cost, q.total, false));
             if(jpData.length > 0) document.getElementById('emptyMsg_jp').style.display = 'none';
             
+            // 載入韓國紀錄
             const krData = JSON.parse(localStorage.getItem('olanaQuotes') || '[]');
             krData.forEach(q => renderSavedItem_kr(q.id, q.name, q.cost, q.total, false));
             if(krData.length > 0) document.getElementById('emptyMsg_kr').style.display = 'none';
 
+            // 載入日本匯率
             const rate = localStorage.getItem('nipponSelectRate');
-            if(rate) document.getElementById('currency_jp').value = rate;
+            if(rate) {
+                document.getElementById('currency_jp').value = rate;
+                document.getElementById('japanShipping_jp').placeholder = `匯率×${rate}`;
+            }
         });
 
         document.addEventListener('keydown', (e) => {
