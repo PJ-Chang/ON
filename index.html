@@ -36,6 +36,7 @@
         .app-container { display: none; width: 100%; }
         .app-container.active { display: block; }
 
+        /* 頂部切換按鈕 */
         .view-switch-btn {
             position: fixed; right: 20px; top: 20px; height: 45px;      
             display: flex; align-items: center; justify-content: center;
@@ -45,32 +46,31 @@
         }
         .view-switch-btn.top-hidden { opacity: 0; visibility: hidden; transform: translateY(-50px); }
 
+        /* 記事本按鈕 */
         .toggle-sidebar-btn {
             position: fixed; left: 20px; top: 20px; height: 45px; width: 45px;  
             background-color: var(--brand-primary); color: white; border: none;
             border-radius: 50%; cursor: pointer; font-size: 18px; z-index: 1000;
             box-shadow: 0 4px 10px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s ease;
         }
         .toggle-sidebar-btn.hidden { opacity: 0; visibility: hidden; transform: scale(0.5); }
+        .toggle-sidebar-btn.scroll-hidden { opacity: 0; visibility: hidden; transform: translateY(-100px); }
 
         @media (max-width: 900px) {
-            .toggle-sidebar-btn.scroll-hidden { opacity: 0; visibility: hidden; transform: translateY(-100px); }
             .toggle-sidebar-btn, .view-switch-btn { top: 15px; height: 36px; }
             .toggle-sidebar-btn { width: 36px; left: 15px; }
             .view-switch-btn { right: 15px; padding: 0 12px; font-size: 13px; }
         }
 
-        /* 記事本內部的切換按鈕 */
+        /* 記事本切換鈕 */
         .switch-app-btn {
             width: 100%; padding: 12px; border-radius: 8px; font-size: 15px; font-weight: bold;
             cursor: pointer; margin-bottom: 20px; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px;
             background: #fdfdfd; border: 2px dashed #ccc; color: #666;
         }
 
-        /* 置中關鍵：使用 flex 置中排版 */
         .page-layout { display: flex; width: 100%; align-items: flex-start; justify-content: center; }
-        
-        /* 側邊欄佔位器：當關閉時 width 為 0，主畫面自然置中 */
         .sidebar-spacer { width: 0; transition: width 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); flex-shrink: 0; }
         .sidebar-spacer.open { width: 370px; }
         @media (max-width: 900px) { .sidebar-spacer.open { width: 0 !important; } }
@@ -91,7 +91,6 @@
 
         .saved-list-container { flex: 1; overflow-y: auto; }
 
-        /* 卡片樣式 */
         .saved-item { background: #FCFAFA; border: 1px solid #E0D8D0; border-radius: 12px; padding: 15px; margin-bottom: 15px; position: relative; display: flex; align-items: flex-start; gap: 12px; box-sizing: border-box; }
         .item-content { flex: 1; display: flex; flex-direction: column; position: relative; text-align: left; }
         .quote-name { font-size: 18px; color: #4A4036; display: block; margin-bottom: 4px; font-weight: bold; }
@@ -108,14 +107,25 @@
         h2 { text-align: center; margin-top: 0; color: var(--brand-text); font-size: 24px; font-weight: 800; margin-bottom: 25px; width: 100%; }
         h2::before { content: "▫️ "; font-size: 14px; color: var(--brand-primary); }
 
+        /* 手機版標題強制單行 */
+        @media (max-width: 480px) {
+            h2 { 
+                font-size: 20px !important; 
+                white-space: nowrap !important; 
+                letter-spacing: -0.5px;
+            }
+        }
+
         .input-group { margin-bottom: 20px; text-align: left; }
         label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14.5px; color: var(--brand-text); }
         
         input[type="number"], select, input[type="text"] { width: 100%; padding: 12px; border: 1px solid #E0D8D0; border-radius: 6px; box-sizing: border-box; font-size: 16px; height: 46px; background-color: #FCFAFA; }
-        .option-group { display: flex; gap: 15px; margin-bottom: 12px; flex-wrap: wrap; }
-        .option-label { font-weight: normal; display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 14.5px; }
+        
+        /* 強制利潤單行 */
+        .option-group { display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: nowrap !important; }
+        .option-label { font-weight: normal; display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 14px; white-space: nowrap; }
 
-        input[type="radio"], .round-checkbox { width: 18px; height: 18px; accent-color: var(--brand-primary); cursor: pointer; appearance: none; -webkit-appearance: none; border: 1px solid #ccc; border-radius: 50%; background: #fff; display: inline-flex; align-items: center; justify-content: center; }
+        input[type="radio"], .round-checkbox { width: 18px; height: 18px; accent-color: var(--brand-primary); cursor: pointer; appearance: none; -webkit-appearance: none; border: 1px solid #ccc; border-radius: 50%; background: #fff; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
         input[type="radio"]:checked, .round-checkbox:checked { background: var(--brand-primary); border-color: var(--brand-primary); }
         input[type="radio"]:checked::after, .round-checkbox:checked::after { content: ""; width: 8px; height: 8px; background: #fff; border-radius: 50%; display: block; }
 
@@ -149,7 +159,7 @@
         <div class="page-layout">
             <div class="sidebar" id="sidebar_jp">
                 <div class="sidebar-header"><h3>Nippon Select</h3><span class="close-btn" onclick="toggleSidebar_jp()">✖</span></div>
-                <button class="switch-app-btn" onclick="switchApp('kr')">🔄 切換至 OLANA 韓國代購</button>
+                <button class="switch-app-btn" onclick="switchApp('kr')">🔄 OLANA 嚴選代購</button>
                 <div class="saved-list-container" id="savedList_jp"></div>
                 <p id="emptyMsg_jp" style="color: #A0A0A0; font-size: 14px; text-align: center; margin-top: 30px;">目前尚無紀錄</p>
             </div>
@@ -159,7 +169,14 @@
                     <h2>Nippon Select 日本代購</h2>
                     <div class="input-group"><label>1. 選擇商品幣別</label><select id="currency_jp" onchange="updateAllCurrencyCalcs_jp()"><option value="0.21">日幣 ¥ : 原價 × 0.21</option><option value="0.22">日幣 ¥ : 原價 × 0.22</option></select></div>
                     <div class="input-group"><label>2. 商品原價 (¥)</label><div class="inline-calc-container"><input type="number" id="price_jp" placeholder="輸入日幣原價" oninput="calculateItemPrice_jp()" inputmode="decimal"><span id="itemPriceDisplay_jp" class="inline-calc-result">= 0 元</span></div></div>
-                    <div class="input-group"><label>3. 利潤</label><div class="option-group"><label class="option-label"><input type="radio" name="feeType_jp" value="percent" checked> 按比例 (%)</label><label class="option-label"><input type="radio" name="feeType_jp" value="fixed"> 固定台幣</label></div><input type="number" id="serviceFee_jp" placeholder="輸入數值" inputmode="decimal"></div>
+                    <div class="input-group">
+                        <label>3. 利潤</label>
+                        <div class="option-group">
+                            <label class="option-label"><input type="radio" name="feeType_jp" value="percent" checked> 按比例 (%)</label>
+                            <label class="option-label"><input type="radio" name="feeType_jp" value="fixed"> 固定台幣</label>
+                        </div>
+                        <input type="number" id="serviceFee_jp" placeholder="輸入數值" inputmode="decimal">
+                    </div>
                     <div class="input-group"><label>4. 商品重量 (g)</label><div class="inline-calc-container"><input type="number" id="weight_jp" placeholder="重量" oninput="calculateWeightFee_jp()" inputmode="decimal"><span id="weightFeeDisplay_jp" class="inline-calc-result">= 0 元</span></div><span style="font-size: 12px; color: #A0A0A0; margin-top: 5px; display: block;">預估國際運費：克重 × 0.25</span></div>
                     
                     <div class="input-group">
@@ -170,7 +187,7 @@
                         </div>
                         <div class="ship-flex-row">
                             <div id="localShipBox_jp">
-                                <select id="localShipping_jp"><option value="60">7-11 60</option><option value="40">郵局(小) 40</option><option value="80">郵局(大) 80</option></select>
+                                <select id="localShipping_jp"><option value="60">7-11 店到店 60</option><option value="40">郵局(小) 40</option><option value="80">郵局(大) 80</option></select>
                             </div>
                             <div id="japanShipBox_jp" class="hidden-box">
                                 <div class="inline-calc-container"><input type="number" id="japanShipping_jp" placeholder="匯率×0.21" oninput="calculateJapanPrice_jp()" inputmode="decimal"><span id="japanPriceDisplay_jp" class="inline-calc-result">= 0 元</span></div>
@@ -188,7 +205,7 @@
                     <p id="rowLocalShip_jp"><span>台灣運費：</span> <span id="resLocalShipping_jp">0 元</span></p>
                     <p><span>利潤：</span> <span id="resServiceFee_jp">0 元</span></p>
                     <hr><p class="total-price"><span>賣價：</span> <span id="resTotal_jp">0 元</span></p>
-                    <div class="save-section"><input type="text" id="quoteName_jp" placeholder="報價名稱"><button class="save-btn" id="saveBtn_jp" onclick="saveToSidebar_jp()" disabled>💾 儲存</button></div>
+                    <div class="save-section"><input type="text" id="quoteName_jp" placeholder="儲存報價名稱"><button class="save-btn" id="saveBtn_jp" onclick="saveToSidebar_jp()" disabled>💾 儲存至記事本</button></div>
                 </div>
             </div>
         </div>
@@ -200,7 +217,7 @@
         <div class="page-layout">
             <div class="sidebar" id="sidebar_kr">
                 <div class="sidebar-header"><h3>OLANA</h3><span class="close-btn" onclick="toggleSidebar_kr()">✖</span></div>
-                <button class="switch-app-btn" onclick="switchApp('jp')">🔄 切換至 Nippon Select</button>
+                <button class="switch-app-btn" onclick="switchApp('jp')">🔄 Nippon Select 日本代購</button>
                 <div class="saved-list-container" id="savedList_kr"></div>
                 <p id="emptyMsg_kr" style="color: #9A8C7F; font-size: 14px; text-align: center; margin-top: 30px;">目前尚無紀錄</p>
             </div>
@@ -211,9 +228,16 @@
                     <div class="input-group"><label>1. 商品幣別</label><select id="currency_kr" onchange="toggleCustomRate_kr()"><option value="42">韓幣 ÷ 42</option><option value="custom">自訂匯率</option></select>
                     <div id="customRateContainer_kr" style="display: none; margin-top: 10px;"><input type="number" id="customRate_kr" placeholder="輸入除數" oninput="calculateItemPrice_kr()" inputmode="decimal"></div></div>
                     <div class="input-group"><label id="priceLabel_kr">2. 商品原價 (₩)</label><div class="inline-calc-container"><input type="number" id="price_kr" placeholder="輸入原價" oninput="calculateItemPrice_kr()" inputmode="decimal"><span id="itemPriceDisplay_kr" class="inline-calc-result">= 0 元</span></div></div>
-                    <div class="input-group"><label>3. 利潤</label><div class="radio-group"><label><input type="radio" name="feeType_kr" value="percent" checked> 按比例 (%)</label><label><input type="radio" name="feeType_kr" value="fixed"> 固定台幣</label></div><input type="number" id="serviceFee_kr" placeholder="輸入數值" inputmode="decimal"></div>
+                    <div class="input-group">
+                        <label>3. 利潤</label>
+                        <div class="option-group">
+                            <label class="option-label"><input type="radio" name="feeType_kr" value="percent" checked> 按比例 (%)</label>
+                            <label class="option-label"><input type="radio" name="feeType_kr" value="fixed"> 固定台幣</label>
+                        </div>
+                        <input type="number" id="serviceFee_kr" placeholder="輸入數值" inputmode="decimal">
+                    </div>
                     <div class="input-group"><label>4. 重量 (g)</label><div class="inline-calc-container"><input type="number" id="weight_kr" placeholder="重量" oninput="calculateWeightFee_kr()" inputmode="decimal"><span id="weightFeeDisplay_kr" class="inline-calc-result">= 0 元</span></div><span style="font-size: 12px; color: #A0A0A0; margin-top: 5px; display: block;">預估國際運費：克重 × 0.19</span></div>
-                    <div class="input-group"><label>5. 台灣運費</label><select id="localShipping_kr"><option value="60">7-11 60</option><option value="40">郵局(小) 40</option><option value="80">郵局(大) 80</option></select></div>
+                    <div class="input-group"><label>5. 台灣運費</label><select id="localShipping_kr"><option value="60">7-11 店到店 60</option><option value="40">郵局(小) 40</option><option value="80">郵局(大) 80</option></select></div>
                     <button class="primary-btn" onclick="calculateTotal_kr()">立即計算總價</button>
                 </div>
                 <div class="result waiting" id="resultBox_kr">
@@ -223,17 +247,46 @@
                     <p><span>台灣運費：</span> <span id="resLocalShipping_kr">0 元</span></p>
                     <p><span>利潤：</span> <span id="resServiceFee_kr">0 元</span></p>
                     <hr><p class="total-price"><span>賣價：</span> <span id="resTotal_kr">0 元</span></p>
-                    <div class="save-section"><input type="text" id="quoteName_kr" placeholder="報價名稱"><button class="save-btn" id="saveBtn_kr" onclick="saveToSidebar_kr()" disabled>💾 儲存</button></div>
+                    <div class="save-section"><input type="text" id="quoteName_kr" placeholder="儲存報價名稱"><button class="save-btn" id="saveBtn_kr" onclick="saveToSidebar_kr()" disabled>💾 儲存至記事本</button></div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // === 切換 App 與記憶模式 ===
+        let lastScrollTop = 0;
+
+        // === 滾動控制邏輯 ===
+        window.addEventListener('scroll', () => {
+            let st = window.pageYOffset || document.documentElement.scrollTop;
+            const historyBtnJp = document.getElementById('historyBtn_jp');
+            const historyBtnKr = document.getElementById('historyBtn_kr');
+            const viewBtnJp = document.getElementById('viewSwitchBtn_jp');
+            const viewBtnKr = document.getElementById('viewSwitchBtn_kr');
+
+            // 1. 切換按鈕：只在最頂端顯示
+            if (st > 10) {
+                viewBtnJp.classList.add('top-hidden');
+                viewBtnKr.classList.add('top-hidden');
+            } else {
+                viewBtnJp.classList.remove('top-hidden');
+                viewBtnKr.classList.remove('top-hidden');
+            }
+
+            // 2. 記事本按鈕：向下滑隱藏，向上滑出現
+            if (st > lastScrollTop && st > 50) {
+                historyBtnJp.classList.add('scroll-hidden');
+                historyBtnKr.classList.add('scroll-hidden');
+            } else {
+                historyBtnJp.classList.remove('scroll-hidden');
+                historyBtnKr.classList.remove('scroll-hidden');
+            }
+            lastScrollTop = st <= 0 ? 0 : st;
+        }, { passive: true });
+
+        // === 切換 App ===
         function switchApp(mode) {
             document.querySelectorAll('.app-container').forEach(el => el.classList.remove('active'));
-            // 每次切換都隱藏側邊欄，確保畫面置中
             document.querySelectorAll('.sidebar, .sidebar-spacer').forEach(el => el.classList.remove('open'));
             document.querySelectorAll('.toggle-sidebar-btn').forEach(el => el.classList.remove('hidden'));
             
@@ -244,7 +297,6 @@
                 document.getElementById('app-jp').classList.add('active');
                 document.body.className = 'theme-jp';
             }
-            // 記憶目前模式
             localStorage.setItem('onSelectActiveMode', mode);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -301,7 +353,7 @@
         function saveToSidebar_jp() {
             const name = document.getElementById('quoteName_jp').value.trim();
             if(!name) return alert("請輸入報價名稱");
-            renderSavedItem_jp('save_jp_'+Date.now(), name, "成本："+document.getElementById('resCost_jp')?.innerText || "", "賣價："+document.getElementById('resTotal_jp').innerText, true);
+            renderSavedItem_jp('save_jp_'+Date.now(), name, "成本："+document.getElementById('resItemPrice_jp').innerText, "賣價："+document.getElementById('resTotal_jp').innerText, true);
             document.getElementById('emptyMsg_jp').style.display = 'none';
             document.getElementById('quoteName_jp').value = '';
             saveOrderToStorage_jp();
@@ -389,7 +441,7 @@
         function saveToSidebar_kr() {
             const name = document.getElementById('quoteName_kr').value.trim();
             if(!name) return alert("請輸入報價名稱");
-            renderSavedItem_kr('save_kr_'+Date.now(), name, "成本："+document.getElementById('resCost_kr')?.innerText || "", "賣價："+document.getElementById('resTotal_kr').innerText, true);
+            renderSavedItem_kr('save_kr_'+Date.now(), name, "成本："+document.getElementById('resItemPrice_kr').innerText, "賣價："+document.getElementById('resTotal_kr').innerText, true);
             document.getElementById('emptyMsg_kr').style.display = 'none';
             document.getElementById('quoteName_kr').value = '';
             saveOrderToStorage_kr();
@@ -425,23 +477,19 @@
             }
         }
 
-        // === 初始化與恢復模式 ===
+        // === 初始化 ===
         window.addEventListener('DOMContentLoaded', () => {
-            // 恢復最後一次使用的模式
             const lastMode = localStorage.getItem('onSelectActiveMode') || 'jp';
             switchApp(lastMode);
 
-            // 載入日本紀錄
             const jpData = JSON.parse(localStorage.getItem('nipponSelectQuotes') || '[]');
             jpData.forEach(q => renderSavedItem_jp(q.id, q.name, q.cost, q.total, false));
             if(jpData.length > 0) document.getElementById('emptyMsg_jp').style.display = 'none';
             
-            // 載入韓國紀錄
             const krData = JSON.parse(localStorage.getItem('olanaQuotes') || '[]');
             krData.forEach(q => renderSavedItem_kr(q.id, q.name, q.cost, q.total, false));
             if(krData.length > 0) document.getElementById('emptyMsg_kr').style.display = 'none';
 
-            // 載入日本匯率
             const rate = localStorage.getItem('nipponSelectRate');
             if(rate) {
                 document.getElementById('currency_jp').value = rate;
