@@ -105,6 +105,11 @@
 
         /* ================= 主要計算機 ================= */
         .main-container { display: flex; gap: 25px; width: 100%; max-width: 900px; flex-wrap: wrap; justify-content: center; margin-top: 50px; }
+        
+        /* 💡 修正位置：新增手動切換強制排版規則 */
+        body.force-mobile .main-container { flex-direction: column !important; align-items: center !important; max-width: 450px !important; }
+        body.force-desktop .main-container { flex-direction: row !important; flex-wrap: nowrap !important; max-width: 900px !important; align-items: flex-start !important; }
+
         .calculator, .result { background: #ffffff; padding: 35px; border-radius: 12px; box-shadow: var(--box-shadow); flex: 1; min-width: 320px; box-sizing: border-box; }
 
         h2, h3 { text-align: center; margin-top: 0; color: var(--brand-text); width: 100%; font-size: 24px; font-weight: 800; margin-bottom: 25px; width: 100%; }
@@ -142,7 +147,6 @@
         .save-btn:disabled { background-color: #E0E0E0; color: #A0A0A0; cursor: not-allowed; }
 
         .hidden-box { display: none !important; }
-        body.force-desktop .main-container { flex-wrap: nowrap !important; max-width: 1000px !important; }
         @media (max-width: 900px) { .main-container { flex-direction: column; max-width: 450px; } }
     </style>
 </head>
@@ -349,9 +353,9 @@
             document.getElementById('resultBox_jp').classList.remove('waiting');
             document.getElementById('saveBtn_jp').disabled = false;
             
-            // 加入滑動到底部代碼
+            // 💡 修正位置：精準置中
             setTimeout(() => {
-                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                document.getElementById('resultBox_jp').scrollIntoView({ behavior: 'smooth', block: 'center' });
             }, 100);
         }
         function saveToSidebar_jp() {
@@ -396,15 +400,19 @@
             document.getElementById('sidebarSpacer_jp').classList.toggle('open');
             document.getElementById('historyBtn_jp').classList.toggle('hidden');
         }
+        
+        // 💡 修正位置：切換邏輯
         function toggleViewMode_jp() {
             const btn = document.getElementById('viewSwitchBtn_jp');
             if (btn.innerHTML.includes('手機版')) {
                 document.body.classList.remove('force-desktop');
+                document.body.classList.add('force-mobile'); // 強制手機版
                 document.getElementById('viewportMeta').setAttribute('content', 'width=device-width, initial-scale=1.0');
                 btn.innerHTML = '💻 電腦版';
                 document.getElementById('viewSwitchBtn_kr').innerHTML = '💻 電腦版';
             } else {
-                document.body.classList.add('force-desktop');
+                document.body.classList.remove('force-mobile');
+                document.body.classList.add('force-desktop'); // 強制電腦版
                 document.getElementById('viewportMeta').setAttribute('content', 'width=1100');
                 btn.innerHTML = '📱 手機版';
                 document.getElementById('viewSwitchBtn_kr').innerHTML = '📱 手機版';
@@ -447,9 +455,9 @@
             document.getElementById('resultBox_kr').classList.remove('waiting');
             document.getElementById('saveBtn_kr').disabled = false;
             
-            // 加入滑動到底部代碼
+            // 💡 修正位置：精準置中
             setTimeout(() => {
-                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                document.getElementById('resultBox_kr').scrollIntoView({ behavior: 'smooth', block: 'center' });
             }, 100);
         }
         function toggleSidebar_kr() {
@@ -489,15 +497,19 @@
             });
             localStorage.setItem('olanaQuotes', JSON.stringify(items));
         }
+        
+        // 💡 修正位置：切換邏輯
         function toggleViewMode_kr() {
             const btn = document.getElementById('viewSwitchBtn_kr');
             if (btn.innerHTML.includes('手機版')) {
                 document.body.classList.remove('force-desktop');
+                document.body.classList.add('force-mobile'); // 強制手機版
                 document.getElementById('viewportMeta').setAttribute('content', 'width=device-width, initial-scale=1.0');
                 btn.innerHTML = '💻 電腦版';
                 document.getElementById('viewSwitchBtn_jp').innerHTML = '💻 電腦版';
             } else {
-                document.body.classList.add('force-desktop');
+                document.body.classList.add('force-desktop'); // 強制電腦版
+                document.body.classList.remove('force-mobile');
                 document.getElementById('viewportMeta').setAttribute('content', 'width=1100');
                 btn.innerHTML = '📱 手機版';
                 document.getElementById('viewSwitchBtn_jp').innerHTML = '📱 手機版';
