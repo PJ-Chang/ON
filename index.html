@@ -86,11 +86,15 @@
         }
         .switch-app-btn:hover { background: #f0f0f0; border-color: #aaa; color: #333; }
 
+        /* 超級外框 */
         .page-layout { display: flex; width: 100%; max-width: 1200px; align-items: flex-start; justify-content: center; margin-top: 0; }
+
+        /* 隱形的推擠空間 */
         .sidebar-spacer { width: 0; transition: width 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); flex-shrink: 0; }
         .sidebar-spacer.open { width: 350px; }
         @media (max-width: 900px) { .sidebar-spacer.open { width: 0; } }
 
+        /* 左側收合選單 (記事本) */
         .sidebar {
             background: #ffffff; border-radius: 12px; box-shadow: var(--box-shadow);
             width: 330px; max-width: 85vw; padding: 25px; 
@@ -101,12 +105,15 @@
         }
         .sidebar.open { opacity: 1; visibility: visible; transform: translateX(0) scale(1); }
 
-        .sidebar-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed #E0D8D0; padding-bottom: 20px; margin-bottom: 20px; flex-shrink: 0; }
-        .sidebar-header h3 { margin: 0; font-size: 18px; line-height: 1.2; color: var(--brand-text); font-weight: bold; }
-        .close-btn { cursor: pointer; color: var(--brand-accent); font-weight: bold; font-size: 20px; transition: color 0.2s; }
+        /* 記事本標題 (上下置中、按鈕靠右) */
+        .sidebar-header { display: flex; align-items: center; position: relative; border-bottom: 2px dashed #E0D8D0; padding-bottom: 20px; margin-bottom: 20px; flex-shrink: 0; min-height: 24px; }
+        .sidebar-header h3 { margin: 0; font-size: 18px; line-height: 1; color: var(--brand-text); font-weight: bold; text-align: left; }
+        .close-btn { cursor: pointer; color: var(--brand-accent); font-weight: bold; font-size: 20px; transition: color 0.2s; position: absolute; right: 0; top: 50%; transform: translateY(-50%); }
         .close-btn:hover { color: var(--brand-primary); }
 
         .saved-list-container { flex: 1; overflow-y: auto; padding-right: 5px; }
+        
+        /* 每一筆儲存的報價卡片 */
         .saved-item { background: #FCFAFA; border: 1px solid #E0D8D0; border-radius: 8px; margin-bottom: 12px; position: relative; }
         .saved-item-inner { display: flex; align-items: flex-start; gap: 10px; padding: 12px; width: 100%; box-sizing: border-box; transform-origin: center; }
         .saved-item.dragging { opacity: 0.6; background-color: #f5ece8; border: 1px dashed var(--brand-primary); z-index: 100; }
@@ -125,9 +132,11 @@
         .editable-text:hover::after { content: " ✎"; font-size: 12px; color: var(--brand-primary); position: absolute; }
         .editable-text:focus::after { display: none; }
 
+        /* 主要計算機外框 */
         .main-container { display: flex; gap: 25px; width: 100%; max-width: 900px; flex-wrap: wrap; justify-content: center; transition: all 0.3s ease; margin-top: 50px; }
         .calculator, .result { background: #ffffff; padding: 35px; border-radius: 12px; box-shadow: var(--box-shadow); flex: 1; min-width: 320px; box-sizing: border-box; }
 
+        /* 強制版面切換 */
         body.force-mobile .main-container { flex-direction: column !important; flex-wrap: nowrap !important; max-width: 450px !important; }
         body.force-mobile .calculator, body.force-mobile .result { width: 100% !important; }
         body.force-mobile .sidebar-spacer.open { width: 0 !important; }
@@ -136,13 +145,18 @@
         body.force-desktop .main-container { flex-wrap: nowrap !important; max-width: 1000px !important; }
         body.force-desktop .sidebar-spacer.open { width: 350px !important; }
 
-        h2 { text-align: center; margin-top: 0; color: var(--brand-text); letter-spacing: 1px; font-size: 28px; font-weight: 800; }
+        /* 放大的主標題 */
+        h2 { text-align: center; margin-top: 0; color: var(--brand-text); letter-spacing: 1px; font-size: 28px; font-weight: 800; white-space: nowrap; width: 100%; }
         h3 { text-align: center; margin-top: 0; color: var(--brand-text); letter-spacing: 1px; font-size: 18px; }
-        h2::before, h3::before { content: "▫️ "; font-size: 14px; color: var(--brand-primary); vertical-align: middle; }
         
-        /* 修正手機版標題：強制單行顯示並稍微縮小字體以適應寬度 */
+        /* 平板版標題：縮小字體以防破版 */
+        @media (max-width: 900px) { 
+            h2 { font-size: 23px; white-space: nowrap; letter-spacing: 0px; margin-bottom: 20px; text-align: center; } 
+        }
+
+        /* 手機版標題：強制單行顯示並置中 */
         @media (max-width: 480px) { 
-            h2 { font-size: 21px; white-space: nowrap; letter-spacing: -0.5px; margin-bottom: 20px; } 
+            h2 { font-size: 21px; white-space: nowrap; letter-spacing: -0.5px; margin-bottom: 20px; text-align: center; } 
         }
 
         .input-group { margin-bottom: 20px; }
@@ -221,7 +235,7 @@
         <div class="page-layout">
             <div class="sidebar" id="sidebar_jp">
                 <div class="sidebar-header">
-                    <h3>Nippon Select 日本代購</h3>
+                    <h3>Nippon Select</h3>
                     <span class="close-btn" onclick="toggleSidebar_jp()">✖</span>
                 </div>
                 
@@ -328,7 +342,7 @@
         <div class="page-layout">
             <div class="sidebar" id="sidebar_kr">
                 <div class="sidebar-header">
-                    <h3>OLANA 嚴選代購</h3>
+                    <h3>OLANA</h3>
                     <span class="close-btn" onclick="toggleSidebar_kr()">✖</span>
                 </div>
                 
@@ -424,36 +438,40 @@
     <script>
         // === 切換 App 邏輯 ===
         function switchApp(mode) {
-            // 1. 強制隱藏兩邊的記事本側邊欄
-            document.getElementById('sidebar_jp').classList.remove('open');
-            document.getElementById('sidebarSpacer_jp').classList.remove('open');
-            document.getElementById('historyBtn_jp').classList.remove('hidden');
+            const isDesktop = document.body.classList.contains('force-desktop') || window.innerWidth > 900;
+            const sJp = document.getElementById('sidebar_jp');
+            const spJp = document.getElementById('sidebarSpacer_jp');
+            const btnJp = document.getElementById('historyBtn_jp');
+            
+            const sKr = document.getElementById('sidebar_kr');
+            const spKr = document.getElementById('sidebarSpacer_kr');
+            const btnKr = document.getElementById('historyBtn_kr');
+            
+            // 抓出「當前」是否開啟選單 (跨系統共享狀態)
+            const wasOpen = sJp.classList.contains('open') || sKr.classList.contains('open');
 
-            document.getElementById('sidebar_kr').classList.remove('open');
-            document.getElementById('sidebarSpacer_kr').classList.remove('open');
-            document.getElementById('historyBtn_kr').classList.remove('hidden');
+            // 1. 同步兩邊狀態：不論切到哪邊，狀態都要是一致的
+            if (wasOpen && isDesktop) {
+                sJp.classList.add('open'); spJp.classList.add('open'); btnJp.classList.add('hidden');
+                sKr.classList.add('open'); spKr.classList.add('open'); btnKr.classList.add('hidden');
+            } else {
+                sJp.classList.remove('open'); spJp.classList.remove('open'); btnJp.classList.remove('hidden');
+                sKr.classList.remove('open'); spKr.classList.remove('open'); btnKr.classList.remove('hidden');
+            }
 
-            // 2. 切換主體顯示與觸發漸顯動畫
-            const appJp = document.getElementById('app-jp');
-            const appKr = document.getElementById('app-kr');
-
+            // 2. 切換顯隱
             if (mode === 'kr') {
-                appJp.classList.remove('active');
-                void appKr.offsetWidth; // 觸發重繪以重啟動畫
-                appKr.classList.add('active');
-
+                document.getElementById('app-jp').classList.remove('active');
+                document.getElementById('app-kr').classList.add('active');
                 document.body.className = 'theme-kr';
                 document.title = "OLANA 嚴選代購";
             } else {
-                appKr.classList.remove('active');
-                void appJp.offsetWidth; // 觸發重繪以重啟動畫
-                appJp.classList.add('active');
-
+                document.getElementById('app-kr').classList.remove('active');
+                document.getElementById('app-jp').classList.add('active');
                 document.body.className = 'theme-jp';
                 document.title = "Nippon Select - 日本代購計算";
             }
 
-            // 3. 畫面滾動回最頂部 (平滑)
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -548,9 +566,18 @@
         }
 
         function toggleSidebar_jp() {
-            document.getElementById('sidebar_jp').classList.toggle('open');
-            document.getElementById('historyBtn_jp').classList.toggle('hidden');
-            document.getElementById('sidebarSpacer_jp').classList.toggle('open');
+            const sidebar = document.getElementById('sidebar_jp');
+            const spacer = document.getElementById('sidebarSpacer_jp');
+            const historyBtn = document.getElementById('historyBtn_jp');
+            
+            sidebar.classList.toggle('open');
+            spacer.classList.toggle('open');
+            
+            if (sidebar.classList.contains('open')) {
+                historyBtn.classList.add('hidden');
+            } else {
+                historyBtn.classList.remove('hidden');
+            }
         }
 
         function toggleViewMode_jp() {
@@ -576,7 +603,8 @@
             document.getElementById('emptyMsg_jp').style.display = 'none';
             document.getElementById('quoteName_jp').value = '';
             saveOrderToStorage_jp();
-            toggleSidebar_jp();
+            const sidebar = document.getElementById('sidebar_jp');
+            if (!sidebar.classList.contains('open')) { toggleSidebar_jp(); }
             document.getElementById('saveBtn_jp').disabled = true;
         }
 
@@ -785,9 +813,13 @@
             const historyBtn = document.getElementById('historyBtn_kr');
             
             sidebar.classList.toggle('open');
-            spacer.classList.toggle('open'); 
+            spacer.classList.toggle('open');
             
-            if (sidebar.classList.contains('open')) { historyBtn.classList.add('hidden'); } else { historyBtn.classList.remove('hidden'); }
+            if (sidebar.classList.contains('open')) {
+                historyBtn.classList.add('hidden');
+            } else {
+                historyBtn.classList.remove('hidden');
+            }
         }
 
         function loadFromStorage_kr() {
