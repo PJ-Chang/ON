@@ -298,7 +298,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // === 日本版邏輯 (內容保護不變) ===
+        // === 日本版邏輯 ===
         function updateAllCurrencyCalcs_jp() {
             const rate = document.getElementById('currency_jp').value;
             localStorage.setItem('nipponSelectRate', rate);
@@ -348,6 +348,11 @@
             if(japan > 0) document.getElementById('resJapanShipping_jp').innerText = japan + ' 元';
             document.getElementById('resultBox_jp').classList.remove('waiting');
             document.getElementById('saveBtn_jp').disabled = false;
+            
+            // 加入滑動到底部代碼
+            setTimeout(() => {
+                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+            }, 100);
         }
         function saveToSidebar_jp() {
             const name = document.getElementById('quoteName_jp').value.trim();
@@ -441,6 +446,11 @@
             document.getElementById('resTotal_kr').innerText = total + ' 元';
             document.getElementById('resultBox_kr').classList.remove('waiting');
             document.getElementById('saveBtn_kr').disabled = false;
+            
+            // 加入滑動到底部代碼
+            setTimeout(() => {
+                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+            }, 100);
         }
         function toggleSidebar_kr() {
             document.getElementById('sidebar_kr').classList.toggle('open');
