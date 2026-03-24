@@ -551,9 +551,9 @@
             
             toggleCustomRate_kr();
 
-            // 網頁載入時立刻抓一次，接著設定每 0.5 秒 (500ms) 背景無感更新一次
+            // 網頁載入時立刻抓一次，接著設定每 5 秒 (5000ms) 背景無感更新一次
             fetchCloudDataBackground();
-            setInterval(fetchCloudDataBackground, 500);
+            setInterval(fetchCloudDataBackground, 5000);
         });
 
         document.addEventListener('keydown', (e) => {
