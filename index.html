@@ -111,7 +111,7 @@
         @media (max-width: 480px) { h2 { font-size: 20px !important; white-space: nowrap !important; letter-spacing: -0.5px; } }
 
         .input-group { margin-bottom: 20px; text-align: left; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14.5px; color: var(--brand-text); }
+        .label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14.5px; color: var(--brand-text); }
         input[type="number"], select, input[type="text"] { width: 100%; padding: 12px; border: 1px solid #E0D8D0; border-radius: 6px; box-sizing: border-box; font-size: 16px; height: 46px; background-color: #FCFAFA; }
         .option-group { display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: nowrap !important; }
         .option-label { font-weight: normal; display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 14px; white-space: nowrap; }
@@ -252,6 +252,7 @@
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbzUzXG8Bp0Xb725QtcZHwht89P-N8JceKHnpyHg6UAVr7WmPnw6OBVLenQ7RcYC_z5n/exec";
+        let isSyncLocked = false;
 
         function syncToCloud(mode, dataArray) {
             fetch(API_URL, {
@@ -412,6 +413,7 @@
             }
         }
         function saveToSidebar_jp() {
+            isSyncLocked = true;
             const name = document.getElementById('quoteName_jp').value.trim();
             if(!name) return alert("請輸入報價名稱");
             renderSavedItem_jp('save_jp_'+Date.now(), name, "成本："+document.getElementById('resCost_jp').innerText, "賣價："+document.getElementById('resTotal_jp').innerText, true);
@@ -420,6 +422,7 @@
             saveOrderToStorage_jp();
             if (!document.getElementById('sidebar_jp').classList.contains('open')) toggleSidebar_jp();
             document.getElementById('saveBtn_jp').disabled = true;
+            setTimeout(() => { isSyncLocked = false; }, 3000);
         }
         function renderSavedItem_jp(id, name, cost, total, prepend) {
             const div = document.createElement('div'); div.className = 'saved-item'; div.id = id;
@@ -427,7 +430,13 @@
             const list = document.getElementById('savedList_jp');
             if(prepend) list.insertBefore(div, list.firstChild); else list.appendChild(div);
         }
-        function deleteItem_jp(id) { document.getElementById(id).remove(); if(document.querySelectorAll('#app-jp .saved-item').length === 0) document.getElementById('emptyMsg_jp').style.display = 'block'; saveOrderToStorage_jp(); }
+        function deleteItem_jp(id) { 
+            isSyncLocked = true;
+            document.getElementById(id).remove(); 
+            if(document.querySelectorAll('#app-jp .saved-item').length === 0) document.getElementById('emptyMsg_jp').style.display = 'block'; 
+            saveOrderToStorage_jp(); 
+            setTimeout(() => { isSyncLocked = false; }, 3000);
+        }
         
         function saveOrderToStorage_jp() {
             const items = [];
@@ -446,6 +455,7 @@
         function toggleSidebar_jp() { document.getElementById('sidebar_jp').classList.toggle('open'); document.getElementById('sidebarSpacer_jp').classList.toggle('open'); document.getElementById('historyBtn_jp').classList.toggle('hidden'); }
         function toggleSidebar_kr() { document.getElementById('sidebar_kr').classList.toggle('open'); document.getElementById('sidebarSpacer_kr').classList.toggle('open'); document.getElementById('historyBtn_kr').classList.toggle('hidden'); }
         function saveToSidebar_kr() {
+            isSyncLocked = true;
             const name = document.getElementById('quoteName_kr').value.trim();
             if(!name) return alert("請輸入報價名稱");
             renderSavedItem_kr('save_kr_'+Date.now(), name, "成本："+document.getElementById('resCost_kr').innerText, "賣價："+document.getElementById('resTotal_kr').innerText, true);
@@ -454,6 +464,7 @@
             saveOrderToStorage_kr();
             if (!document.getElementById('sidebar_kr').classList.contains('open')) toggleSidebar_kr();
             document.getElementById('saveBtn_kr').disabled = true;
+            setTimeout(() => { isSyncLocked = false; }, 3000);
         }
         function renderSavedItem_kr(id, name, cost, total, prepend) {
             const div = document.createElement('div'); div.className = 'saved-item'; div.id = id;
@@ -461,7 +472,13 @@
             const list = document.getElementById('savedList_kr');
             if(prepend) list.insertBefore(div, list.firstChild); else list.appendChild(div);
         }
-        function deleteItem_kr(id) { document.getElementById(id).remove(); if(document.querySelectorAll('#app-kr .saved-item').length === 0) document.getElementById('emptyMsg_kr').style.display = 'block'; saveOrderToStorage_kr(); }
+        function deleteItem_kr(id) { 
+            isSyncLocked = true;
+            document.getElementById(id).remove(); 
+            if(document.querySelectorAll('#app-kr .saved-item').length === 0) document.getElementById('emptyMsg_kr').style.display = 'block'; 
+            saveOrderToStorage_kr(); 
+            setTimeout(() => { isSyncLocked = false; }, 3000);
+        }
         
         function saveOrderToStorage_kr() {
             const items = [];
@@ -493,6 +510,7 @@
         }
 
         function fetchCloudDataBackground() {
+            if (isSyncLocked) return;
             fetch(API_URL + "?t=" + new Date().getTime(), { cache: 'no-store' })
                 .then(res => res.json())
                 .then(data => {
