@@ -255,14 +255,14 @@
         let isSyncLocked = false;
 
         function syncToCloud(mode, dataArray) {
-            isSyncLocked = true; // 上傳時鎖定背景抓取，避免蓋掉剛操作的資料
+            isSyncLocked = true; 
             fetch(API_URL, {
                 method: 'POST',
                 body: JSON.stringify({ mode: mode, data: dataArray }),
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' }
             }).then(() => {
-                // 等雲端確定寫入完成，再給 2 秒緩衝才解鎖
-                setTimeout(() => { isSyncLocked = false; }, 2000);
+                // 解鎖時間延長至 4 秒，確保雲端完全寫入，避免背景抓取到舊資料
+                setTimeout(() => { isSyncLocked = false; }, 4000);
             }).catch(err => { 
                 console.log("雲端同步失敗", err);
                 isSyncLocked = false;
@@ -419,17 +419,20 @@
                 btn.innerHTML = '📱 手機版'; document.getElementById('viewSwitchBtn_jp').innerHTML = '📱 手機版';
             }
         }
+
         function saveToSidebar_jp() {
             const name = document.getElementById('quoteName_jp').value.trim();
             if(!name) return alert("請輸入報價名稱");
-            renderSavedItem_jp('save_jp_'+Date.now(), name, "成本："+document.getElementById('resCost_jp').innerText, "賣價："+document.getElementById('resTotal_jp').innerText, true);
+            
+            // 瞬間渲染 UI
+            const id = 'save_jp_' + Date.now();
+            renderSavedItem_jp(id, name, "成本："+document.getElementById('resCost_jp').innerText, "賣價："+document.getElementById('resTotal_jp').innerText, true);
+            
             document.getElementById('emptyMsg_jp').style.display = 'none';
             document.getElementById('quoteName_jp').value = '';
-            
             if (!document.getElementById('sidebar_jp').classList.contains('open')) toggleSidebar_jp();
             document.getElementById('saveBtn_jp').disabled = true;
             
-            // 讓上面 UI 更新瞬間完成後，背景再呼叫存檔
             saveOrderToStorage_jp();
         }
         function renderSavedItem_jp(id, name, cost, total, prepend) {
@@ -439,15 +442,12 @@
             if(prepend) list.insertBefore(div, list.firstChild); else list.appendChild(div);
         }
         function deleteItem_jp(id) { 
-            // 瞬間移除畫面元素
             document.getElementById(id).remove(); 
             if(document.querySelectorAll('#app-jp .saved-item').length === 0) document.getElementById('emptyMsg_jp').style.display = 'block'; 
-            // 背景呼叫存檔
             saveOrderToStorage_jp(); 
         }
         
         function saveOrderToStorage_jp() {
-            // 利用 setTimeout 延遲 10 毫秒執行，把運算壓力丟給背景，讓瀏覽器先完成畫面的瞬間渲染
             setTimeout(() => {
                 const items = [];
                 document.querySelectorAll('#app-jp .saved-item').forEach(el => { 
@@ -460,7 +460,7 @@
                 });
                 localStorage.setItem('nipponSelectQuotes', JSON.stringify(items));
                 syncToCloud('jp', items); 
-            }, 10);
+            }, 0);
         }
         
         function toggleSidebar_jp() { document.getElementById('sidebar_jp').classList.toggle('open'); document.getElementById('sidebarSpacer_jp').classList.toggle('open'); document.getElementById('historyBtn_jp').classList.toggle('hidden'); }
@@ -469,10 +469,12 @@
         function saveToSidebar_kr() {
             const name = document.getElementById('quoteName_kr').value.trim();
             if(!name) return alert("請輸入報價名稱");
-            renderSavedItem_kr('save_kr_'+Date.now(), name, "成本："+document.getElementById('resCost_kr').innerText, "賣價："+document.getElementById('resTotal_kr').innerText, true);
+            
+            const id = 'save_kr_' + Date.now();
+            renderSavedItem_kr(id, name, "成本："+document.getElementById('resCost_kr').innerText, "賣價："+document.getElementById('resTotal_kr').innerText, true);
+            
             document.getElementById('emptyMsg_kr').style.display = 'none';
             document.getElementById('quoteName_kr').value = '';
-            
             if (!document.getElementById('sidebar_kr').classList.contains('open')) toggleSidebar_kr();
             document.getElementById('saveBtn_kr').disabled = true;
             
@@ -485,7 +487,6 @@
             if(prepend) list.insertBefore(div, list.firstChild); else list.appendChild(div);
         }
         function deleteItem_kr(id) { 
-            // 瞬間移除畫面元素
             document.getElementById(id).remove(); 
             if(document.querySelectorAll('#app-kr .saved-item').length === 0) document.getElementById('emptyMsg_kr').style.display = 'block'; 
             saveOrderToStorage_kr(); 
@@ -504,7 +505,7 @@
                 });
                 localStorage.setItem('olanaQuotes', JSON.stringify(items));
                 syncToCloud('kr', items); 
-            }, 10);
+            }, 0);
         }
         
         function copyItem(id) {
@@ -527,6 +528,9 @@
             fetch(API_URL + "?t=" + new Date().getTime(), { cache: 'no-store' })
                 .then(res => res.json())
                 .then(data => {
+                    // 收到資料後，最後一秒檢查是否正在同步中，避免閃現舊資料
+                    if (isSyncLocked) return;
+                    
                     const isEditing = document.activeElement && document.activeElement.classList.contains('editable-text');
                     
                     if (data.jp) {
@@ -582,7 +586,6 @@
             
             toggleCustomRate_kr();
 
-            // 網頁載入時立刻抓一次，接著設定每 5 秒 (5000ms) 背景無感更新一次
             fetchCloudDataBackground();
             setInterval(fetchCloudDataBackground, 5000);
         });
