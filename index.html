@@ -492,6 +492,39 @@
             if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } 
         }
 
+        // === 新增：背景自動同步防護機制 ===
+        function fetchCloudDataBackground() {
+            fetch(API_URL + "?t=" + new Date().getTime(), { cache: 'no-store' })
+                .then(res => res.json())
+                .then(data => {
+                    // 防護罩：如果游標正在記事本的文字上，就不打斷更新畫面
+                    const isEditing = document.activeElement && document.activeElement.classList.contains('editable-text');
+                    
+                    if (data.jp) {
+                        const newJpStr = JSON.stringify(data.jp);
+                        const oldJpStr = localStorage.getItem('nipponSelectQuotes') || '[]';
+                        // 只有當雲端資料有變，而且你「沒有」在編輯時，才偷偷替換畫面
+                        if (newJpStr !== oldJpStr && !isEditing) {
+                            localStorage.setItem('nipponSelectQuotes', newJpStr);
+                            document.getElementById('savedList_jp').innerHTML = ''; 
+                            data.jp.forEach(q => renderSavedItem_jp(q.id, q.name, q.cost, q.total, false));
+                            document.getElementById('emptyMsg_jp').style.display = data.jp.length > 0 ? 'none' : 'block';
+                        }
+                    }
+                    if (data.kr) {
+                        const newKrStr = JSON.stringify(data.kr);
+                        const oldKrStr = localStorage.getItem('olanaQuotes') || '[]';
+                        if (newKrStr !== oldKrStr && !isEditing) {
+                            localStorage.setItem('olanaQuotes', newKrStr);
+                            document.getElementById('savedList_kr').innerHTML = ''; 
+                            data.kr.forEach(q => renderSavedItem_kr(q.id, q.name, q.cost, q.total, false));
+                            document.getElementById('emptyMsg_kr').style.display = data.kr.length > 0 ? 'none' : 'block';
+                        }
+                    }
+                })
+                .catch(err => console.log("背景更新維持本機", err));
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             const lastMode = localStorage.getItem('onSelectActiveMode') || 'jp';
             switchApp(lastMode);
@@ -521,26 +554,11 @@
             
             toggleCustomRate_kr();
 
-            fetch(API_URL + "?t=" + new Date().getTime(), { cache: 'no-store' })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.jp) {
-                        localStorage.setItem('nipponSelectQuotes', JSON.stringify(data.jp));
-                        document.getElementById('savedList_jp').innerHTML = ''; 
-                        data.jp.forEach(q => renderSavedItem_jp(q.id, q.name, q.cost, q.total, false));
-                        document.getElementById('emptyMsg_jp').style.display = data.jp.length > 0 ? 'none' : 'block';
-                    }
-                    if (data.kr) {
-                        localStorage.setItem('olanaQuotes', JSON.stringify(data.kr));
-                        document.getElementById('savedList_kr').innerHTML = ''; 
-                        data.kr.forEach(q => renderSavedItem_kr(q.id, q.name, q.cost, q.total, false));
-                        document.getElementById('emptyMsg_kr').style.display = data.kr.length > 0 ? 'none' : 'block';
-                    }
-                })
-                .catch(err => console.log("無法連線至雲端，維持使用本機資料", err));
+            // 網頁載入時立刻抓一次，接著設定每 3 秒 (3000ms) 背景無感更新一次
+            fetchCloudDataBackground();
+            setInterval(fetchCloudDataBackground, 3000);
         });
 
-        // ================= 最新修正區塊 =================
         document.addEventListener('keydown', (e) => {
             if (isTypingIME || e.isComposing || e.keyCode === 229) return;
             if (e.key === 'Enter') {
@@ -550,7 +568,6 @@
                 
                 if (isJp) { 
                     if(activeEl.id === 'quoteName_jp') {
-                        // 【關鍵修改】：檢查實體按鈕是否被鎖定，沒有鎖定才能存檔
                         if(!document.getElementById('saveBtn_jp').disabled) {
                             saveToSidebar_jp(); 
                         }
@@ -559,7 +576,6 @@
                     } 
                 } else { 
                     if(activeEl.id === 'quoteName_kr') {
-                        // 【關鍵修改】：檢查實體按鈕是否被鎖定，沒有鎖定才能存檔
                         if(!document.getElementById('saveBtn_kr').disabled) {
                             saveToSidebar_kr(); 
                         }
