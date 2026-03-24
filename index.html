@@ -63,7 +63,7 @@
 
         .switch-app-btn {
             width: 100%; padding: 12px; border-radius: 8px; font-size: 15px; font-weight: bold;
-            cursor: pointer; margin-bottom: 20px; transition: 0.3s; display: flex; align-items: center; justify-content: gap: 8px;
+            cursor: pointer; margin-bottom: 20px; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px;
             background: #fdfdfd; border: 2px dashed #ccc; color: #666;
         }
 
@@ -472,7 +472,6 @@
             navigator.clipboard.writeText(text).then(() => alert('已複製報價！'));
         }
 
-        // === 修正：加入更嚴密的「輸入法狀態」追蹤 (防呆機制) ===
         let isTypingIME = false;
         document.addEventListener('compositionstart', () => { isTypingIME = true; });
         document.addEventListener('compositionend', () => { isTypingIME = false; });
@@ -512,7 +511,8 @@
             
             toggleCustomRate_kr();
 
-            fetch(API_URL)
+            // 只有這裡加上了強制更新防護，其餘不動
+            fetch(API_URL + "?t=" + new Date().getTime(), { cache: 'no-store' })
                 .then(res => res.json())
                 .then(data => {
                     if (data.jp) {
@@ -531,7 +531,6 @@
                 .catch(err => console.log("無法連線至雲端，維持使用本機資料", err));
         });
 
-        // === 修正：保護快捷鍵，確保打字選字時不觸發儲存 ===
         document.addEventListener('keydown', (e) => {
             if (isTypingIME || e.isComposing || e.keyCode === 229) return;
             if (e.key === 'Enter') {
