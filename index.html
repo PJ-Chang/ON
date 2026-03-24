@@ -283,7 +283,6 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // === 日本版邏輯 ===
         function updateAllCurrencyCalcs_jp() {
             const rate = document.getElementById('currency_jp').value;
             localStorage.setItem('nipponSelectRate', rate);
@@ -341,7 +340,6 @@
             setTimeout(() => { resBox.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
 
-        // === 韓國版邏輯 ===
         function toggleCustomRate_kr() {
             const val = document.getElementById('currency_kr').value;
             const isCustom = val === 'custom';
@@ -389,7 +387,6 @@
             setTimeout(() => { resBox.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
 
-        // === 公用邏輯 ===
         function toggleViewMode_jp() {
             const btn = document.getElementById('viewSwitchBtn_jp');
             if (btn.innerHTML.includes('手機版')) {
@@ -434,7 +431,15 @@
         
         function saveOrderToStorage_jp() {
             const items = [];
-            document.querySelectorAll('#app-jp .saved-item').forEach(el => { items.push({ id: el.id, name: el.querySelector('.quote-name').innerText, cost: el.querySelector('.quote-cost').innerText, total: el.querySelector('.quote-total').innerText }); });
+            // 使用 textContent 取代 innerText 確保隱藏時依然能抓到字
+            document.querySelectorAll('#app-jp .saved-item').forEach(el => { 
+                items.push({ 
+                    id: el.id, 
+                    name: el.querySelector('.quote-name').textContent, 
+                    cost: el.querySelector('.quote-cost').textContent, 
+                    total: el.querySelector('.quote-total').textContent 
+                }); 
+            });
             localStorage.setItem('nipponSelectQuotes', JSON.stringify(items));
             syncToCloud('jp', items); 
         }
@@ -461,14 +466,22 @@
         
         function saveOrderToStorage_kr() {
             const items = [];
-            document.querySelectorAll('#app-kr .saved-item').forEach(el => { items.push({ id: el.id, name: el.querySelector('.quote-name').innerText, cost: el.querySelector('.quote-cost').innerText, total: el.querySelector('.quote-total').innerText }); });
+            // 使用 textContent 取代 innerText 確保隱藏時依然能抓到字
+            document.querySelectorAll('#app-kr .saved-item').forEach(el => { 
+                items.push({ 
+                    id: el.id, 
+                    name: el.querySelector('.quote-name').textContent, 
+                    cost: el.querySelector('.quote-cost').textContent, 
+                    total: el.querySelector('.quote-total').textContent 
+                }); 
+            });
             localStorage.setItem('olanaQuotes', JSON.stringify(items));
             syncToCloud('kr', items); 
         }
         
         function copyItem(id) {
             const el = document.getElementById(id);
-            const text = `${el.querySelector('.quote-name').innerText}\n${el.querySelector('.quote-cost').innerText}\n${el.querySelector('.quote-total').innerText}`;
+            const text = `${el.querySelector('.quote-name').textContent}\n${el.querySelector('.quote-cost').textContent}\n${el.querySelector('.quote-total').textContent}`;
             navigator.clipboard.writeText(text).then(() => alert('已複製報價！'));
         }
 
@@ -481,7 +494,6 @@
             if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } 
         }
 
-        // === 初始化與雲端讀取 ===
         window.addEventListener('DOMContentLoaded', () => {
             const lastMode = localStorage.getItem('onSelectActiveMode') || 'jp';
             switchApp(lastMode);
@@ -511,7 +523,6 @@
             
             toggleCustomRate_kr();
 
-            // 只有這裡加上了強制更新防護，其餘不動
             fetch(API_URL + "?t=" + new Date().getTime(), { cache: 'no-store' })
                 .then(res => res.json())
                 .then(data => {
