@@ -492,18 +492,15 @@
             if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } 
         }
 
-        // === 新增：背景自動同步防護機制 ===
         function fetchCloudDataBackground() {
             fetch(API_URL + "?t=" + new Date().getTime(), { cache: 'no-store' })
                 .then(res => res.json())
                 .then(data => {
-                    // 防護罩：如果游標正在記事本的文字上，就不打斷更新畫面
                     const isEditing = document.activeElement && document.activeElement.classList.contains('editable-text');
                     
                     if (data.jp) {
                         const newJpStr = JSON.stringify(data.jp);
                         const oldJpStr = localStorage.getItem('nipponSelectQuotes') || '[]';
-                        // 只有當雲端資料有變，而且你「沒有」在編輯時，才偷偷替換畫面
                         if (newJpStr !== oldJpStr && !isEditing) {
                             localStorage.setItem('nipponSelectQuotes', newJpStr);
                             document.getElementById('savedList_jp').innerHTML = ''; 
@@ -554,9 +551,9 @@
             
             toggleCustomRate_kr();
 
-            // 網頁載入時立刻抓一次，接著設定每 3 秒 (3000ms) 背景無感更新一次
+            // 網頁載入時立刻抓一次，接著設定每 0.5 秒 (500ms) 背景無感更新一次
             fetchCloudDataBackground();
-            setInterval(fetchCloudDataBackground, 3000);
+            setInterval(fetchCloudDataBackground, 500);
         });
 
         document.addEventListener('keydown', (e) => {
