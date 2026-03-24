@@ -100,19 +100,16 @@
         /* ================= 主要計算機 (排版邏輯修正) ================= */
         .main-container { display: flex; gap: 25px; width: 100%; max-width: 900px; flex-wrap: wrap; justify-content: center; margin-top: 50px; transition: all 0.3s ease; }
         
-        /* 強制模式 */
         body.force-mobile .main-container { flex-direction: column !important; align-items: center !important; max-width: 450px !important; }
         body.force-desktop .main-container { flex-direction: row !important; flex-wrap: nowrap !important; max-width: 900px !important; align-items: flex-start !important; }
 
         .calculator, .result { background: #ffffff; padding: 35px; border-radius: 12px; box-shadow: var(--box-shadow); flex: 1; min-width: 320px; box-sizing: border-box; }
 
-        /* 標題置中與樣式 */
         h2, h3 { text-align: center; margin-top: 0; color: var(--brand-text); width: 100%; font-size: 24px; font-weight: 800; margin-bottom: 25px; }
         h2::before, h3::before { content: "▫️ "; font-size: 14px; color: var(--brand-primary); }
 
         @media (max-width: 480px) { h2 { font-size: 20px !important; white-space: nowrap !important; letter-spacing: -0.5px; } }
 
-        /* 輸入框樣式 (完全不動) */
         .input-group { margin-bottom: 20px; text-align: left; }
         label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14.5px; color: var(--brand-text); }
         input[type="number"], select, input[type="text"] { width: 100%; padding: 12px; border: 1px solid #E0D8D0; border-radius: 6px; box-sizing: border-box; font-size: 16px; height: 46px; background-color: #FCFAFA; }
@@ -126,7 +123,6 @@
         .ship-flex-row { display: flex; gap: 8px; flex-wrap: nowrap; margin-top: 5px; align-items: flex-start; }
         #localShipBox_jp { flex: 1.1; } #japanShipBox_jp { flex: 1.6; }
 
-        /* 特效 CSS */
         @keyframes resultFlash {
             0% { transform: scale(0.97); opacity: 0.8; }
             50% { transform: scale(1.03); opacity: 1; }
@@ -235,7 +231,7 @@
                         </div>
                         <input type="number" id="serviceFee_kr" placeholder="輸入比例 或 固定金額" inputmode="decimal">
                     </div>
-                    <div class="input-group"><label>4. 重量 (g)</label><div class="inline-calc-container"><input type="number" id="weight_kr" placeholder="商品重量" oninput="calculateWeightFee_kr()" inputmode="decimal"><span id="weightFeeDisplay_kr" class="inline-calc-result">= 0 元</span></div><span style="font-size: 12px; color: #A0A0A0; margin-top: 5px; display: block;">預估國際運費：克重 × 0.19</span></div>
+                    <div class="input-group"><label>4. 商品重量 (g)</label><div class="inline-calc-container"><input type="number" id="weight_kr" placeholder="商品重量" oninput="calculateWeightFee_kr()" inputmode="decimal"><span id="weightFeeDisplay_kr" class="inline-calc-result">= 0 元</span></div><span style="font-size: 12px; color: #A0A0A0; margin-top: 5px; display: block;">預估國際運費：克重 × 0.19</span></div>
                     <div class="input-group"><label>5. 台灣運費</label><select id="localShipping_kr"><option value="60">7-11 店到店 60</option><option value="40">郵局(小) 40</option><option value="80">郵局(大) 80</option></select></div>
                     <button class="primary-btn" onclick="calculateTotal_kr()">立即計算總價</button>
                 </div>
@@ -277,7 +273,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // === 日本版 (計算邏輯完全不動) ===
+        // === 日本版邏輯 (不動) ===
         function updateAllCurrencyCalcs_jp() {
             const rate = document.getElementById('currency_jp').value;
             localStorage.setItem('nipponSelectRate', rate);
@@ -328,25 +324,27 @@
             document.getElementById('resultBox_jp').classList.remove('waiting');
             document.getElementById('saveBtn_jp').disabled = false;
             
-            // 特效與置中
             const resBox = document.getElementById('resultBox_jp');
             resBox.classList.remove('result-animate');
             void resBox.offsetWidth; 
             resBox.classList.add('result-animate');
-            setTimeout(() => {
-                resBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 100);
+            setTimeout(() => { resBox.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
 
-        // === 韓國版 (計算邏輯完全不動) ===
+        // === 韓國版邏輯 (修正記憶失效順序) ===
         function toggleCustomRate_kr() {
-            const isCustom = document.getElementById('currency_kr').value === 'custom';
+            const val = document.getElementById('currency_kr').value;
+            const isCustom = val === 'custom';
             document.getElementById('customRateContainer_kr').style.display = isCustom ? 'block' : 'none';
+            localStorage.setItem('olanaRateType', val);
             calculateItemPrice_kr();
         }
         function calculateItemPrice_kr() {
             const price = parseFloat(document.getElementById('price_kr').value) || 0;
-            const rate = document.getElementById('currency_kr').value === 'custom' ? (parseFloat(document.getElementById('customRate_kr').value) || 1) : 42;
+            const rateType = document.getElementById('currency_kr').value;
+            const customInput = document.getElementById('customRate_kr');
+            const rate = rateType === 'custom' ? (parseFloat(customInput.value) || 1) : 42;
+            if(rateType === 'custom') { localStorage.setItem('olanaCustomRate', customInput.value); }
             document.getElementById('itemPriceDisplay_kr').innerText = '= ' + Math.round(price / rate) + ' 元';
         }
         function calculateWeightFee_kr() {
@@ -374,47 +372,36 @@
             document.getElementById('resultBox_kr').classList.remove('waiting');
             document.getElementById('saveBtn_kr').disabled = false;
             
-            // 特效與置中
             const resBox = document.getElementById('resultBox_kr');
             resBox.classList.remove('result-animate');
             void resBox.offsetWidth; 
             resBox.classList.add('result-animate');
-            setTimeout(() => {
-                resBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 100);
+            setTimeout(() => { resBox.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
 
-        // === 切換與共用邏輯 (完全不動) ===
+        // === 公用邏輯 (不動) ===
         function toggleViewMode_jp() {
             const btn = document.getElementById('viewSwitchBtn_jp');
             if (btn.innerHTML.includes('手機版')) {
-                document.body.classList.remove('force-desktop');
-                document.body.classList.add('force-mobile');
+                document.body.classList.remove('force-desktop'); document.body.classList.add('force-mobile');
                 document.getElementById('viewportMeta').setAttribute('content', 'width=device-width, initial-scale=1.0');
-                btn.innerHTML = '💻 電腦版';
-                document.getElementById('viewSwitchBtn_kr').innerHTML = '💻 電腦版';
+                btn.innerHTML = '💻 電腦版'; document.getElementById('viewSwitchBtn_kr').innerHTML = '💻 電腦版';
             } else {
-                document.body.classList.add('force-desktop');
-                document.body.classList.remove('force-mobile');
+                document.body.classList.add('force-desktop'); document.body.classList.remove('force-mobile');
                 document.getElementById('viewportMeta').setAttribute('content', 'width=1100');
-                btn.innerHTML = '📱 手機版';
-                document.getElementById('viewSwitchBtn_kr').innerHTML = '📱 手機版';
+                btn.innerHTML = '📱 手機版'; document.getElementById('viewSwitchBtn_kr').innerHTML = '📱 手機版';
             }
         }
         function toggleViewMode_kr() {
             const btn = document.getElementById('viewSwitchBtn_kr');
             if (btn.innerHTML.includes('手機版')) {
-                document.body.classList.remove('force-desktop');
-                document.body.classList.add('force-mobile');
+                document.body.classList.remove('force-desktop'); document.body.classList.add('force-mobile');
                 document.getElementById('viewportMeta').setAttribute('content', 'width=device-width, initial-scale=1.0');
-                btn.innerHTML = '💻 電腦版';
-                document.getElementById('viewSwitchBtn_jp').innerHTML = '💻 電腦版';
+                btn.innerHTML = '💻 電腦版'; document.getElementById('viewSwitchBtn_jp').innerHTML = '💻 電腦版';
             } else {
-                document.body.classList.add('force-desktop');
-                document.body.classList.remove('force-mobile');
+                document.body.classList.add('force-desktop'); document.body.classList.remove('force-mobile');
                 document.getElementById('viewportMeta').setAttribute('content', 'width=1100');
-                btn.innerHTML = '📱 手機版';
-                document.getElementById('viewSwitchBtn_jp').innerHTML = '📱 手機版';
+                btn.innerHTML = '📱 手機版'; document.getElementById('viewSwitchBtn_jp').innerHTML = '📱 手機版';
             }
         }
         function saveToSidebar_jp() {
@@ -470,17 +457,32 @@
         }
         function handleEnter(e) { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } }
 
+        // === 初始化與記憶讀取 (核心修正處) ===
         window.addEventListener('DOMContentLoaded', () => {
             const lastMode = localStorage.getItem('onSelectActiveMode') || 'jp';
             switchApp(lastMode);
+
             const jpData = JSON.parse(localStorage.getItem('nipponSelectQuotes') || '[]');
             jpData.forEach(q => renderSavedItem_jp(q.id, q.name, q.cost, q.total, false));
             if(jpData.length > 0) document.getElementById('emptyMsg_jp').style.display = 'none';
+
             const krData = JSON.parse(localStorage.getItem('olanaQuotes') || '[]');
             krData.forEach(q => renderSavedItem_kr(q.id, q.name, q.cost, q.total, false));
             if(krData.length > 0) document.getElementById('emptyMsg_kr').style.display = 'none';
-            const rate = localStorage.getItem('nipponSelectRate');
-            if(rate) { document.getElementById('currency_jp').value = rate; document.getElementById('japanShipping_jp').placeholder = `匯率×${rate}`; }
+
+            // 日本版記憶
+            const rateJp = localStorage.getItem('nipponSelectRate');
+            if(rateJp) { document.getElementById('currency_jp').value = rateJp; document.getElementById('japanShipping_jp').placeholder = `匯率×${rateJp}`; }
+
+            // 💡 修正順序：先填入數值，再執行顯示切換
+            const rateKrType = localStorage.getItem('olanaRateType');
+            const customKrVal = localStorage.getItem('olanaCustomRate');
+
+            if(rateKrType) { document.getElementById('currency_kr').value = rateKrType; }
+            if(customKrVal) { document.getElementById('customRate_kr').value = customKrVal; }
+            
+            // 執行切換顯示邏輯
+            toggleCustomRate_kr();
         });
 
         document.addEventListener('keydown', (e) => {
