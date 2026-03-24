@@ -251,7 +251,6 @@
     </div>
 
     <script>
-        // 【新增：雲端 API 網址與同步函式】
         const API_URL = "https://script.google.com/macros/s/AKfycbzUzXG8Bp0Xb725QtcZHwht89P-N8JceKHnpyHg6UAVr7WmPnw6OBVLenQ7RcYC_z5n/exec";
 
         function syncToCloud(mode, dataArray) {
@@ -433,12 +432,11 @@
         }
         function deleteItem_jp(id) { document.getElementById(id).remove(); if(document.querySelectorAll('#app-jp .saved-item').length === 0) document.getElementById('emptyMsg_jp').style.display = 'block'; saveOrderToStorage_jp(); }
         
-        // 【修改：儲存時觸發同步至雲端】
         function saveOrderToStorage_jp() {
             const items = [];
             document.querySelectorAll('#app-jp .saved-item').forEach(el => { items.push({ id: el.id, name: el.querySelector('.quote-name').innerText, cost: el.querySelector('.quote-cost').innerText, total: el.querySelector('.quote-total').innerText }); });
             localStorage.setItem('nipponSelectQuotes', JSON.stringify(items));
-            syncToCloud('jp', items); // 寫入雲端
+            syncToCloud('jp', items); 
         }
         
         function toggleSidebar_jp() { document.getElementById('sidebar_jp').classList.toggle('open'); document.getElementById('sidebarSpacer_jp').classList.toggle('open'); document.getElementById('historyBtn_jp').classList.toggle('hidden'); }
@@ -461,12 +459,11 @@
         }
         function deleteItem_kr(id) { document.getElementById(id).remove(); if(document.querySelectorAll('#app-kr .saved-item').length === 0) document.getElementById('emptyMsg_kr').style.display = 'block'; saveOrderToStorage_kr(); }
         
-        // 【修改：儲存時觸發同步至雲端】
         function saveOrderToStorage_kr() {
             const items = [];
             document.querySelectorAll('#app-kr .saved-item').forEach(el => { items.push({ id: el.id, name: el.querySelector('.quote-name').innerText, cost: el.querySelector('.quote-cost').innerText, total: el.querySelector('.quote-total').innerText }); });
             localStorage.setItem('olanaQuotes', JSON.stringify(items));
-            syncToCloud('kr', items); // 寫入雲端
+            syncToCloud('kr', items); 
         }
         
         function copyItem(id) {
@@ -474,14 +471,18 @@
             const text = `${el.querySelector('.quote-name').innerText}\n${el.querySelector('.quote-cost').innerText}\n${el.querySelector('.quote-total').innerText}`;
             navigator.clipboard.writeText(text).then(() => alert('已複製報價！'));
         }
-        function handleEnter(e) { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } }
+
+        // 修改：防止中文輸入法選字時誤觸 Enter
+        function handleEnter(e) { 
+            if (e.isComposing || e.keyCode === 229) return; 
+            if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } 
+        }
 
         // === 初始化與雲端讀取 ===
         window.addEventListener('DOMContentLoaded', () => {
             const lastMode = localStorage.getItem('onSelectActiveMode') || 'jp';
             switchApp(lastMode);
 
-            // 自動偵測：如果視窗夠寬（在電腦上），預設為電腦版模式
             if (window.innerWidth > 900) {
                 document.body.classList.add('force-desktop');
                 document.getElementById('viewportMeta').setAttribute('content', 'width=1100');
@@ -489,7 +490,6 @@
                 document.getElementById('viewSwitchBtn_kr').innerHTML = '📱 手機版';
             }
 
-            // 先讀取本地 localStorage 的資料，確保畫面不用等
             const jpData = JSON.parse(localStorage.getItem('nipponSelectQuotes') || '[]');
             jpData.forEach(q => renderSavedItem_jp(q.id, q.name, q.cost, q.total, false));
             if(jpData.length > 0) document.getElementById('emptyMsg_jp').style.display = 'none';
@@ -498,11 +498,9 @@
             krData.forEach(q => renderSavedItem_kr(q.id, q.name, q.cost, q.total, false));
             if(krData.length > 0) document.getElementById('emptyMsg_kr').style.display = 'none';
 
-            // 日本版記憶
             const rateJp = localStorage.getItem('nipponSelectRate');
             if(rateJp) { document.getElementById('currency_jp').value = rateJp; document.getElementById('japanShipping_jp').placeholder = `匯率×${rateJp}`; }
 
-            // 韓國版記憶
             const rateKrType = localStorage.getItem('olanaRateType');
             const customKrVal = localStorage.getItem('olanaCustomRate');
             if(rateKrType) { document.getElementById('currency_kr').value = rateKrType; }
@@ -510,21 +508,18 @@
             
             toggleCustomRate_kr();
 
-            // 【新增：背景從 Google 雲端抓取最新資料並自動更新】
             fetch(API_URL)
                 .then(res => res.json())
                 .then(data => {
-                    // 更新日本版資料
                     if (data.jp) {
                         localStorage.setItem('nipponSelectQuotes', JSON.stringify(data.jp));
-                        document.getElementById('savedList_jp').innerHTML = ''; // 清空舊的
+                        document.getElementById('savedList_jp').innerHTML = ''; 
                         data.jp.forEach(q => renderSavedItem_jp(q.id, q.name, q.cost, q.total, false));
                         document.getElementById('emptyMsg_jp').style.display = data.jp.length > 0 ? 'none' : 'block';
                     }
-                    // 更新韓國版資料
                     if (data.kr) {
                         localStorage.setItem('olanaQuotes', JSON.stringify(data.kr));
-                        document.getElementById('savedList_kr').innerHTML = ''; // 清空舊的
+                        document.getElementById('savedList_kr').innerHTML = ''; 
                         data.kr.forEach(q => renderSavedItem_kr(q.id, q.name, q.cost, q.total, false));
                         document.getElementById('emptyMsg_kr').style.display = data.kr.length > 0 ? 'none' : 'block';
                     }
@@ -532,7 +527,9 @@
                 .catch(err => console.log("無法連線至雲端，維持使用本機資料", err));
         });
 
+        // 修改：防止中文輸入法選字時誤觸 Enter
         document.addEventListener('keydown', (e) => {
+            if (e.isComposing || e.keyCode === 229) return;
             if (e.key === 'Enter') {
                 const isJp = document.getElementById('app-jp').classList.contains('active');
                 const activeEl = document.activeElement;
