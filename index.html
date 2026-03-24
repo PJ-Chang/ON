@@ -431,7 +431,6 @@
         
         function saveOrderToStorage_jp() {
             const items = [];
-            // 使用 textContent 取代 innerText 確保隱藏時依然能抓到字
             document.querySelectorAll('#app-jp .saved-item').forEach(el => { 
                 items.push({ 
                     id: el.id, 
@@ -466,7 +465,6 @@
         
         function saveOrderToStorage_kr() {
             const items = [];
-            // 使用 textContent 取代 innerText 確保隱藏時依然能抓到字
             document.querySelectorAll('#app-kr .saved-item').forEach(el => { 
                 items.push({ 
                     id: el.id, 
@@ -542,14 +540,33 @@
                 .catch(err => console.log("無法連線至雲端，維持使用本機資料", err));
         });
 
+        // ================= 最新修正區塊 =================
         document.addEventListener('keydown', (e) => {
             if (isTypingIME || e.isComposing || e.keyCode === 229) return;
             if (e.key === 'Enter') {
                 const isJp = document.getElementById('app-jp').classList.contains('active');
                 const activeEl = document.activeElement;
                 if (activeEl.classList.contains('editable-text')) return;
-                if (isJp) { if(activeEl.id === 'quoteName_jp') saveToSidebar_jp(); else calculateTotal_jp(); } 
-                else { if(activeEl.id === 'quoteName_kr') saveToSidebar_kr(); else calculateTotal_kr(); }
+                
+                if (isJp) { 
+                    if(activeEl.id === 'quoteName_jp') {
+                        // 【關鍵修改】：檢查實體按鈕是否被鎖定，沒有鎖定才能存檔
+                        if(!document.getElementById('saveBtn_jp').disabled) {
+                            saveToSidebar_jp(); 
+                        }
+                    } else { 
+                        calculateTotal_jp(); 
+                    } 
+                } else { 
+                    if(activeEl.id === 'quoteName_kr') {
+                        // 【關鍵修改】：檢查實體按鈕是否被鎖定，沒有鎖定才能存檔
+                        if(!document.getElementById('saveBtn_kr').disabled) {
+                            saveToSidebar_kr(); 
+                        }
+                    } else { 
+                        calculateTotal_kr(); 
+                    } 
+                }
             }
         });
     </script>
